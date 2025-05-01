@@ -6,6 +6,7 @@ import (
 	"github.com/flexer2006/case-person-enrichment-go/internal/service/setup/graceful"
 	"github.com/flexer2006/case-person-enrichment-go/internal/service/setup/logs"
 	"github.com/flexer2006/case-person-enrichment-go/internal/service/setup/migration"
+	"github.com/flexer2006/case-person-enrichment-go/internal/service/setup/server"
 	"go.uber.org/zap"
 )
 
@@ -15,6 +16,7 @@ type Config struct {
 	Postgres   data.PostgresConfig `env-prefix:""`
 	Migrations migration.Config    `env-prefix:""`
 	Graceful   graceful.Config
+	Server     server.Config `env-prefix:""`
 }
 
 // LogFields реализует интерфейс LoggableConfig и возвращает поля конфигурации

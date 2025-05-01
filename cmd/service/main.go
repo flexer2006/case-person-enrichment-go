@@ -5,16 +5,19 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
+	"github.com/flexer2006/case-person-enrichment-go/internal/service/app"
 	"github.com/flexer2006/case-person-enrichment-go/internal/service/setup"
 	"github.com/flexer2006/case-person-enrichment-go/pkg/config"
 	"github.com/flexer2006/case-person-enrichment-go/pkg/database"
 	"github.com/flexer2006/case-person-enrichment-go/pkg/database/migrate"
 	"github.com/flexer2006/case-person-enrichment-go/pkg/logger"
-	"github.com/flexer2006/case-person-enrichment-go/pkg/shutdown"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func main() {
@@ -110,22 +113,67 @@ func main() {
 
 		logger.Info(ctx, "database initialized successfully")
 
-		// Далее основная логика приложения...
+		application, err := app.NewApplication(ctx, cfg)
+		if err != nil {
+			logger.Error(ctx, "failed to initialize application", zap.Error(err))
+			exitCode = 1
+			return
+		}
+
+		// Create a context with cancellation for graceful shutdown
+		appCtx, appCancel := context.WithCancel(ctx)
+		defer appCancel()
+
+		// Set up signal handling
+		stopCh := make(chan os.Signal, 1)
+		signal.Notify(stopCh, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+
+		// Start the application
+		errChan := make(chan error, 1)
+		go func() {
+			errChan <- application.Start(appCtx)
+		}()
 
 		logger.Info(ctx, "service started",
 			zap.String("environment", cfg.Logger.Model),
 			zap.String("log_level", cfg.Logger.Level),
-			zap.String("startup_time", time.Now().Format(time.RFC3339)))
-
-		shutdown.Wait(ctx, shutdownTimeout,
-			func(ctx context.Context) error {
-				if data != nil {
-					logger.Info(ctx, "closing database connection")
-					data.Close(ctx)
+			zap.String("startup_time", time.Now().Format(time.RFC3339)),
+			zap.Object("server_config", zapcore.ObjectMarshalerFunc(func(enc zapcore.ObjectEncoder) error {
+				for _, field := range cfg.Server.LogFields() {
+					field.AddTo(enc)
 				}
 				return nil
-			},
+			})),
 		)
+
+		// Wait for either an application error or shutdown signal
+		var sig os.Signal
+		select {
+		case err := <-errChan:
+			if err != nil {
+				logger.Error(ctx, "application stopped with error", zap.Error(err))
+				exitCode = 1
+			}
+		case sig = <-stopCh:
+			logger.Info(ctx, "received shutdown signal", zap.String("signal", sig.String()))
+		}
+
+		// Create a context with timeout for graceful shutdown
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), shutdownTimeout)
+		defer shutdownCancel()
+
+		// Cancel the application context to signal all components to stop
+		appCancel()
+
+		// Stop the application
+		if err := application.Stop(shutdownCtx); err != nil {
+			logger.Error(ctx, "error stopping application", zap.Error(err))
+			exitCode = 1
+		}
+
+		// Close the database connection
+		logger.Info(ctx, "closing database connection")
+		data.Close(shutdownCtx)
 
 		logger.Info(ctx, "service shutdown complete")
 	}()
