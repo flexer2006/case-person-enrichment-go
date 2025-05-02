@@ -1,19 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API for managing and enriching person data with external services",
-        "title": "Person Enrichment API",
-        "contact": {
-            "name": "API Support",
-            "email": "your-email@example.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        },
-        "version": "1.0"
+        "contact": {}
     },
-    "basePath": "/api/v1",
     "paths": {
         "/persons": {
             "get": {
