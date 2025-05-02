@@ -12,7 +12,18 @@ import (
 	"github.com/flexer2006/case-person-enrichment-go/pkg/logger"
 	"github.com/gofiber/fiber/v3"
 	"go.uber.org/zap"
+
+	_ "github.com/flexer2006/case-person-enrichment-go/docs/swagger"
 )
+
+// @title Person Enrichment API
+// @version 1.0
+// @description API for managing and enriching person data with external services
+// @contact.name API Support
+// @contact.email andrewgo1133official@gmail.com
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+// @BasePath /api/v1
 
 // Server представляет HTTP-сервер приложения.
 type Server struct {
@@ -28,7 +39,20 @@ func New(config server.Config, api api.API, repositories repo.Repositories) *Ser
 		AppName:      "Person Enrichment Service",
 	})
 
-	// Настройка маршрутов
+	app.Get("/swagger", func(c fiber.Ctx) error {
+		r := c.Redirect()
+		r.Status(fiber.StatusFound)
+		return r.To("/swagger/swagger.html")
+	})
+
+	app.Get("/swagger/swagger.html", func(c fiber.Ctx) error {
+		return c.SendFile("./docs/swagger/swagger.html")
+	})
+
+	app.Get("/swagger/swagger.json", func(c fiber.Ctx) error {
+		return c.SendFile("./docs/swagger/swagger.json")
+	})
+
 	routes.Setup(app, api, repositories)
 
 	return &Server{

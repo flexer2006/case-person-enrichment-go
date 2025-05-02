@@ -36,7 +36,23 @@ func NewPersonHandler(api api.API, repositories repo.Repositories) *PersonHandle
 	}
 }
 
-// GetPersons обрабатывает запрос на получение списка персон с фильтрами и пагинацией.
+// GetPersons godoc
+// @Summary Get list of persons
+// @Description Get a list of persons with filtering and pagination
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param limit query int false "Page size limit" default(10) minimum(1)
+// @Param offset query int false "Page offset" default(0) minimum(0)
+// @Param name query string false "Filter by name"
+// @Param surname query string false "Filter by surname"
+// @Param patronymic query string false "Filter by patronymic"
+// @Param gender query string false "Filter by gender"
+// @Param nationality query string false "Filter by nationality"
+// @Param age query int false "Filter by age"
+// @Success 200 {object} map[string]interface{} "Successfully retrieved persons list"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /persons [get]
 func (h *PersonHandler) GetPersons(ctx fiber.Ctx) error {
 	requestCtx := ctx.Context()
 	logger.Debug(requestCtx, "handling get persons request")
@@ -90,7 +106,18 @@ func (h *PersonHandler) GetPersons(ctx fiber.Ctx) error {
 	return nil
 }
 
-// GetPersonByID обрабатывает запрос на получение персоны по идентификатору.
+// GetPersonByID godoc
+// @Summary Get person by ID
+// @Description Get person details by UUID
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path string true "Person UUID" format(uuid)
+// @Success 200 {object} entities.Person "Successfully retrieved person"
+// @Failure 400 {object} map[string]string "Bad request - Invalid UUID"
+// @Failure 404 {object} map[string]string "Person not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /persons/{id} [get]
 func (h *PersonHandler) GetPersonByID(ctx fiber.Ctx) error {
 	requestCtx := ctx.Context()
 	idParam := ctx.Params("id")
@@ -131,7 +158,17 @@ func (h *PersonHandler) GetPersonByID(ctx fiber.Ctx) error {
 	return nil
 }
 
-// CreatePerson обрабатывает запрос на создание новой персоны.
+// CreatePerson godoc
+// @Summary Create new person
+// @Description Create a new person with the input data
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param person body entities.Person true "Person object to be created"
+// @Success 201 {object} entities.Person "Successfully created person"
+// @Failure 400 {object} map[string]string "Bad request - Invalid input"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /persons [post]
 func (h *PersonHandler) CreatePerson(ctx fiber.Ctx) error {
 	requestCtx := ctx.Context()
 	logger.Debug(requestCtx, "handling create person request")
@@ -175,7 +212,19 @@ func (h *PersonHandler) CreatePerson(ctx fiber.Ctx) error {
 	return nil
 }
 
-// UpdatePerson обрабатывает запрос на обновление персоны.
+// UpdatePerson godoc
+// @Summary Update person
+// @Description Update an existing person
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path string true "Person UUID" format(uuid)
+// @Param person body entities.Person true "Person data to update"
+// @Success 200 {object} entities.Person "Successfully updated person"
+// @Failure 400 {object} map[string]string "Bad request - Invalid input"
+// @Failure 404 {object} map[string]string "Person not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /persons/{id} [put]
 func (h *PersonHandler) UpdatePerson(ctx fiber.Ctx) error {
 	requestCtx := ctx.Context()
 	idParam := ctx.Params("id")
@@ -249,7 +298,18 @@ func (h *PersonHandler) UpdatePerson(ctx fiber.Ctx) error {
 	return nil
 }
 
-// DeletePerson обрабатывает запрос на удаление персоны.
+// DeletePerson godoc
+// @Summary Delete person
+// @Description Delete a person by UUID
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path string true "Person UUID" format(uuid)
+// @Success 204 "Successfully deleted"
+// @Failure 400 {object} map[string]string "Bad request - Invalid UUID"
+// @Failure 404 {object} map[string]string "Person not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /persons/{id} [delete]
 func (h *PersonHandler) DeletePerson(ctx fiber.Ctx) error {
 	requestCtx := ctx.Context()
 	idParam := ctx.Params("id")
@@ -290,7 +350,18 @@ func (h *PersonHandler) DeletePerson(ctx fiber.Ctx) error {
 	return nil
 }
 
-// EnrichPerson обрабатывает запрос на обогащение данных персоны.
+// EnrichPerson godoc
+// @Summary Enrich person data
+// @Description Enrich person with age, gender, and nationality data from external APIs
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path string true "Person UUID" format(uuid)
+// @Success 200 {object} entities.Person "Successfully enriched person"
+// @Failure 400 {object} map[string]string "Bad request - Invalid UUID"
+// @Failure 404 {object} map[string]string "Person not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /persons/{id}/enrich [post]
 func (h *PersonHandler) EnrichPerson(ctx fiber.Ctx) error {
 	requestCtx := ctx.Context()
 	idParam := ctx.Params("id")

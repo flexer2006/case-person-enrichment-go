@@ -1,0 +1,294 @@
+basePath: /api/v1
+definitions:
+  entities.Person:
+    properties:
+      age:
+        type: integer
+      created_at:
+        type: string
+      gender:
+        type: string
+      gender_probability:
+        type: number
+      id:
+        type: string
+      name:
+        type: string
+      nationality:
+        type: string
+      nationality_probability:
+        type: number
+      patronymic:
+        type: string
+      surname:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact:
+    email: your-email@example.com
+    name: API Support
+  description: API for managing and enriching person data with external services
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Person Enrichment API
+  version: "1.0"
+paths:
+  /persons:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of persons with filtering and pagination
+      parameters:
+      - default: 10
+        description: Page size limit
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Page offset
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      - description: Filter by name
+        in: query
+        name: name
+        type: string
+      - description: Filter by surname
+        in: query
+        name: surname
+        type: string
+      - description: Filter by patronymic
+        in: query
+        name: patronymic
+        type: string
+      - description: Filter by gender
+        in: query
+        name: gender
+        type: string
+      - description: Filter by nationality
+        in: query
+        name: nationality
+        type: string
+      - description: Filter by age
+        in: query
+        name: age
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved persons list
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get list of persons
+      tags:
+      - persons
+    post:
+      consumes:
+      - application/json
+      description: Create a new person with the input data
+      parameters:
+      - description: Person object to be created
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Person'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created person
+          schema:
+            $ref: '#/definitions/entities.Person'
+        "400":
+          description: Bad request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create new person
+      tags:
+      - persons
+  /persons/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a person by UUID
+      parameters:
+      - description: Person UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully deleted
+        "400":
+          description: Bad request - Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Person not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete person
+      tags:
+      - persons
+    get:
+      consumes:
+      - application/json
+      description: Get person details by UUID
+      parameters:
+      - description: Person UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved person
+          schema:
+            $ref: '#/definitions/entities.Person'
+        "400":
+          description: Bad request - Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Person not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get person by ID
+      tags:
+      - persons
+    put:
+      consumes:
+      - application/json
+      description: Update an existing person
+      parameters:
+      - description: Person UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Person data to update
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated person
+          schema:
+            $ref: '#/definitions/entities.Person'
+        "400":
+          description: Bad request - Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Person not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update person
+      tags:
+      - persons
+  /persons/{id}/enrich:
+    post:
+      consumes:
+      - application/json
+      description: Enrich person with age, gender, and nationality data from external
+        APIs
+      parameters:
+      - description: Person UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully enriched person
+          schema:
+            $ref: '#/definitions/entities.Person'
+        "400":
+          description: Bad request - Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Person not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enrich person data
+      tags:
+      - persons
+swagger: "2.0"
