@@ -1,30 +1,30 @@
-# Сервис обогащения данных о персонах
+# Person Data Enrichment Service
 
-## Описание
+## Description
 
-Данный сервис предназначен для хранения и обогащения информации о людях. Он позволяет создавать, получать, обновлять и удалять записи о персонах, а также обогащать их данными о возрасте, поле и национальности с помощью внешних API.
+This service is designed to store and enrich information about people. It allows creating, retrieving, updating and deleting records about individuals, as well as enriching their data with age, gender, and nationality using external APIs.
 
-## Технологический стек
+## Technology Stack
 
-- **Go v1.24.2** - современный компилируемый язык программирования
-- **Fiber v3.0.0-beta.4** - быстрый HTTP фреймворк, построенный на FastHTTP
-- **PostgreSQL** - высокопроизводительная реляционная база данных
-- **Zap v1.27.0** - структурированная, производительная библиотека для логирования
-- **Docker/Docker Compose v3.8** - для контейнеризации и управления сервисами
-- **Swagger** - для автоматизации документирования API
-- **UUID v1.6.0** - для генерации уникальных идентификаторов
-- **golang-migrate v4.18.3** - инструмент для управления миграциями базы данных
-- **Nginx v1.27.5** - высокопроизводительный веб-сервер и прокси
+- **Go v1.24.2** - modern compiled programming language
+- **Fiber v3.0.0-beta.4** - fast HTTP framework built on FastHTTP
+- **PostgreSQL** - high-performance relational database
+- **Zap v1.27.0** - structured, high-performance logging library
+- **Docker/Docker Compose v3.8** - for containerization and service management
+- **Swagger** - for API documentation automation
+- **UUID v1.6.0** - for generating unique identifiers
+- **golang-migrate v4.18.3** - tool for database migration management
+- **Nginx v1.27.5** - high-performance web server and proxy
 
-## Архитектура
+## Architecture
 
-- **domain** - бизнес-логика и модели данных
-- **ports** - интерфейсы для взаимодействия между слоями
-- **adapters** - реализации интерфейсов для внешних сервисов и баз данных
+- **domain** - business logic and data models
+- **ports** - interfaces for interaction between layers
+- **adapters** - implementations of interfaces for external services and databases
 
-## Запуск сервиса
+## Service Launch
 
-### Установка и запуск с использованием Docker
+### Installation and Launch Using Docker
 
 ```bash
 git clone https://github.com/flexer2006/case-person-enrichment-go.git
@@ -34,59 +34,59 @@ cd deploy
 docker-compose up -d
 ```
 
-После запуска сервис будет доступен через Nginx по адресу: `http://localhost:80`
+After launch, the service will be available via Nginx at: `http://localhost:80`
 
-## Конфигурация
+## Configuration
 
-Основные настройки находятся в файле .env. Пример конфигурации можно найти в .env.example.
+The main settings are located in the .env file. A configuration example can be found in .env.example.
 
-### Основные параметры
+### Main Parameters
 
-- **База данных**: настройки подключения к PostgreSQL
-- **HTTP-сервер**: параметры для Fiber
-- **Nginx**: параметры для проксирования запросов
-- **Логирование**: настройки логов
+- **Database**: PostgreSQL connection settings
+- **HTTP Server**: Fiber parameters
+- **Nginx**: request proxying parameters
+- **Logging**: log settings
 
-## Документация API
+## API Documentation
 
 ### Swagger UI
 
-Интерактивная документация API доступна по адресу: `http://localhost/swagger/swagger.html`
+Interactive API documentation is available at: `http://localhost/swagger/swagger.html`
 
-## Эндпоинты API
+## API Endpoints
 
-### Основной URL: `/api/v1`
+### Base URL: `/api/v1`
 
-| Метод  | Путь                  | Описание                                           |
-| ------ | --------------------- | -------------------------------------------------- |
-| GET    | `/persons`            | Получение списка персон с фильтрацией и пагинацией |
-| GET    | `/persons/:id`        | Получение персоны по ID                            |
-| POST   | `/persons`            | Создание новой персоны                             |
-| PUT    | `/persons/:id`        | Обновление персоны                                 |
-| PATCH  | `/persons/:id`        | Частичное обновление персоны                       |
-| DELETE | `/persons/:id`        | Удаление персоны                                   |
-| POST   | `/persons/:id/enrich` | Обогащение данных персоны                          |
+| Method | Path                  | Description                                      |
+| ------ | --------------------- | ------------------------------------------------ |
+| GET    | `/persons`            | Get list of persons with filtering and pagination |
+| GET    | `/persons/:id`        | Get person by ID                                 |
+| POST   | `/persons`            | Create a new person                              |
+| PUT    | `/persons/:id`        | Update a person                                  |
+| PATCH  | `/persons/:id`        | Partially update a person                        |
+| DELETE | `/persons/:id`        | Delete a person                                  |
+| POST   | `/persons/:id/enrich` | Enrich person data                               |
 
-## Примеры использования API
+## API Usage Examples
 
-### 1. Получение списка персон с фильтрацией
+### 1. Getting a List of Persons with Filtering
 
 ```bash
-# Получить всех пользователей (первые 10).
+# Get all users (first 10).
 curl -X GET "http://localhost/api/v1/persons"
 
-# С применением фильтров.
-curl -X GET "http://localhost/api/v1/persons?limit=5&offset=0&name=Иван&gender=male"
+# With filters applied.
+curl -X GET "http://localhost/api/v1/persons?limit=5&offset=0&name=Ivan&gender=male"
 ```
 
-Пример ответа:
+Example response:
 ```json
 {
   "data": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
-      "name": "Иван", 
-      "surname": "Иванов",
+      "name": "Ivan", 
+      "surname": "Ivanov",
       "gender": "male",
       "gender_probability": 0.98,
       "nationality": "RU",
@@ -99,83 +99,83 @@ curl -X GET "http://localhost/api/v1/persons?limit=5&offset=0&name=Иван&gend
 }
 ```
 
-### 2. Создание новой персоны
+### 2. Creating a New Person
 
 ```bash
 curl -X POST "http://localhost/api/v1/persons" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Дмитрий",
-    "surname": "Ушаков",
-    "patronymic": "Васильевич"
+    "name": "Dmitry",
+    "surname": "Ushakov",
+    "patronymic": "Vasilievich"
   }'
 ```
 
-### 3. Получение персоны по ID
+### 3. Getting a Person by ID
 
 ```bash
 curl -X GET "http://localhost/api/v1/persons/550e8400-e29b-41d4-a716-446655440001"
 ```
 
-### 4. Обогащение данных персоны
+### 4. Enriching Person Data
 
 ```bash
 curl -X POST "http://localhost/api/v1/persons/550e8400-e29b-41d4-a716-446655440001/enrich"
 ```
 
-### 5. Обновление персоны
+### 5. Updating a Person
 
 ```bash
 curl -X PUT "http://localhost/api/v1/persons/550e8400-e29b-41d4-a716-446655440001" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Дмитрий",
-    "surname": "Ушаков",
-    "patronymic": "Алексеевич"
+    "name": "Dmitry",
+    "surname": "Ushakov",
+    "patronymic": "Alexeevich"
   }'
 ```
 
-### 6. Удаление персоны
+### 6. Deleting a Person
 
 ```bash
 curl -X DELETE "http://localhost/api/v1/persons/550e8400-e29b-41d4-a716-446655440001"
 ```
 
-## Внешние API для обогащения данных
+## External APIs for Data Enrichment
 
-Сервис использует следующие внешние API для обогащения данных:
+The service uses the following external APIs to enrich data:
 
-- **Возраст**: [https://api.agify.io](https://api.agify.io) - определяет вероятный возраст по имени
-- **Пол**: [https://api.genderize.io](https://api.genderize.io) - определяет вероятный пол по имени
-- **Национальность**: [https://api.nationalize.io](https://api.nationalize.io) - определяет вероятную национальность по имени
+- **Age**: [https://api.agify.io](https://api.agify.io) - determines the probable age by name
+- **Gender**: [https://api.genderize.io](https://api.genderize.io) - determines the probable gender by name
+- **Nationality**: [https://api.nationalize.io](https://api.nationalize.io) - determines the probable nationality by name
 
-## Структура базы данных
+## Database Structure
 
-### Таблица `people`
+### Table `people`
 
-| Поле | Тип | Описание |
+| Field | Type | Description |
 |------|-----|----------|
-| `id` | UUID | Первичный ключ, уникальный идентификатор персоны |
-| `name` | VARCHAR(100) | Имя персоны (обязательное) |
-| `surname` | VARCHAR(100) | Фамилия персоны (обязательное) |
-| `patronymic` | VARCHAR(100) | Отчество персоны (необязательное) |
-| `age` | INTEGER | Возраст персоны |
-| `gender` | VARCHAR(10) | Пол персоны |
-| `gender_probability` | DECIMAL(5,4) | Вероятность определения пола |
-| `nationality` | VARCHAR(2) | Код страны (национальность) |
-| `nationality_probability` | DECIMAL(5,4) | Вероятность определения национальности |
-| `created_at` | TIMESTAMP WITH TIME ZONE | Дата и время создания записи |
-| `updated_at` | TIMESTAMP WITH TIME ZONE | Дата и время последнего обновления записи |
+| `id` | UUID | Primary key, unique person identifier |
+| `name` | VARCHAR(100) | Person's first name (required) |
+| `surname` | VARCHAR(100) | Person's last name (required) |
+| `patronymic` | VARCHAR(100) | Person's patronymic (optional) |
+| `age` | INTEGER | Person's age |
+| `gender` | VARCHAR(10) | Person's gender |
+| `gender_probability` | DECIMAL(5,4) | Gender determination probability |
+| `nationality` | VARCHAR(2) | Country code (nationality) |
+| `nationality_probability` | DECIMAL(5,4) | Nationality determination probability |
+| `created_at` | TIMESTAMP WITH TIME ZONE | Record creation date and time |
+| `updated_at` | TIMESTAMP WITH TIME ZONE | Record last update date and time |
 
-## Миграции
+## Migrations
 
-Сервис автоматически применяет миграции при запуске. Файлы миграций находятся в директории migrations.
+The service automatically applies migrations at startup. Migration files are located in the migrations directory.
 
-## Логирование
+## Logging
 
-Система использует структурированное логирование с помощью библиотеки Zap. Логи содержат информацию о запросах, ошибках и работе сервиса.
+The system uses structured logging with the Zap library. Logs contain information about requests, errors, and service operation.
 
-## Скриншоты взаимодействия
+## Interaction Screenshots
 
 Swagger:
 ![alt text](docs/photo/Swagger.png)
@@ -186,9 +186,8 @@ UI:
 `http://localhost/api/v1/persons GET`:
 ![alt text](docs/photo/persons-get.png)
 
-`http://localhost/api/v1/persons?limit=5&offset=0&name=Иван&gender=male`:
-
-ФОТО
+`http://localhost/api/v1/persons?limit=2&offset=0&name=Dmitry123`:
+![alt text](docs/photo/persons-filters.png)
 
 `http://localhost/api/v1/persons POST`:
 ![alt text](docs/photo/persons-post.png)
