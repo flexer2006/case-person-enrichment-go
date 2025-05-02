@@ -50,7 +50,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}()
 
 	<-ctx.Done()
-	return s.Stop(ctx)
+	return nil
 }
 
 // Stop останавливает HTTP-сервер.
@@ -63,4 +63,9 @@ func (s *Server) Stop(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// GetConfig возвращает конфигурацию сервера.
+func (s *Server) GetConfig() server.Config {
+	return s.config
 }

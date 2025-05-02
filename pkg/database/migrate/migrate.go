@@ -21,6 +21,14 @@ var (
 	ErrMigrationPathNotSpecified = errors.New("migration path not specified")
 )
 
+type MigrateInstance interface {
+	Up() error
+	Down() error
+	Version() (uint, bool, error)
+	Force(version int) error
+	Close() (source error, database error)
+}
+
 // Config содержит настройки для миграций.
 type Config struct {
 	// Путь к файлам миграций.

@@ -77,7 +77,6 @@ func main() {
 			shutdownTimeout = 5 * time.Second
 		}
 
-		// Конфигурация базы данных
 		dbConfig := database.Config{
 			Postgres: cfg.Postgres.ToConfig(),
 			Migrate: migrate.Config{
@@ -120,15 +119,12 @@ func main() {
 			return
 		}
 
-		// Create a context with cancellation for graceful shutdown
 		appCtx, appCancel := context.WithCancel(ctx)
 		defer appCancel()
 
-		// Set up signal handling
 		stopCh := make(chan os.Signal, 1)
 		signal.Notify(stopCh, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
-		// Start the application
 		errChan := make(chan error, 1)
 		go func() {
 			errChan <- application.Start(appCtx)
@@ -146,7 +142,6 @@ func main() {
 			})),
 		)
 
-		// Wait for either an application error or shutdown signal
 		var sig os.Signal
 		select {
 		case err := <-errChan:
@@ -158,20 +153,16 @@ func main() {
 			logger.Info(ctx, "received shutdown signal", zap.String("signal", sig.String()))
 		}
 
-		// Create a context with timeout for graceful shutdown
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer shutdownCancel()
 
-		// Cancel the application context to signal all components to stop
 		appCancel()
 
-		// Stop the application
 		if err := application.Stop(shutdownCtx); err != nil {
 			logger.Error(ctx, "error stopping application", zap.Error(err))
 			exitCode = 1
 		}
 
-		// Close the database connection
 		logger.Info(ctx, "closing database connection")
 		data.Close(shutdownCtx)
 

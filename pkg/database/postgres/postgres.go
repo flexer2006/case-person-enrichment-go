@@ -186,6 +186,10 @@ func (db *Database) Close(ctx context.Context) {
 
 // Ping проверяет доступность базы данных.
 func (db *Database) Ping(ctx context.Context) error {
+	if db.pool == nil {
+		return fmt.Errorf("failed to ping database: connection pool is nil")
+	}
+
 	if err := db.pool.Ping(ctx); err != nil {
 		return fmt.Errorf("failed to ping database: %w", err)
 	}

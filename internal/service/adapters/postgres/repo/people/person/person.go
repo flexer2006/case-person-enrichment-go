@@ -115,7 +115,6 @@ func (r *Repository) GetPersons(ctx context.Context, filter map[string]any, offs
 		zap.Int("offset", offset),
 		zap.Int("limit", limit))
 
-	// Построение запроса с учетом фильтров
 	baseQuery := `FROM persons WHERE 1=1`
 	countQuery := `SELECT COUNT(*) ` + baseQuery
 	dataQuery := `
@@ -123,13 +122,11 @@ func (r *Repository) GetPersons(ctx context.Context, filter map[string]any, offs
                nationality, nationality_probability, created_at, updated_at
     ` + baseQuery
 
-	// Добавление фильтров
 	var args []interface{}
 	argNum := 1
 	var conditions []string
 
 	for field, value := range filter {
-		// Проверка на допустимые поля для фильтрации
 		switch field {
 		case "name", "surname", "patronymic", "gender", "nationality":
 			conditions = append(conditions, fmt.Sprintf("%s ILIKE $%d", field, argNum))
@@ -150,7 +147,7 @@ func (r *Repository) GetPersons(ctx context.Context, filter map[string]any, offs
 		dataQuery += filterCondition
 	}
 
-	// Запрос общего количества записей
+	// Запрос общего количества записей.
 	var total int
 	err := r.db.Pool().QueryRow(ctx, countQuery, args...).Scan(&total)
 	if err != nil {
